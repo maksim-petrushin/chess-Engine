@@ -5,10 +5,13 @@ import java.util.Arrays;
 import javax.swing.*;
 
 public class UserInterface extends JPanel implements MouseListener, MouseMotionListener {
-	private static int turn = 0;
 	private static final long serialVersionUID = 1L;
 	static int mouseX, mouseY, newMouseX, newMouseY;
 	static int squareSize=32;
+	Timer stopwatch;
+	int count=0;
+	int delay =200;
+	int turn =0;
 	@Override
 	public void paintComponent(Graphics g) {
 		
@@ -90,6 +93,11 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 				g.drawImage(chessPieceImage, (i%8)*squareSize, (i/8)*squareSize, (i%8+1)*squareSize, (i/8+1)*squareSize, j*77, k*77, (j+1)*77, (k+1)*77, this);
 
 			}
+
+		}
+		System.out.println("repainted");
+		if(turn==1) {
+			turn =2;
 		}
 		
 
@@ -103,6 +111,11 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		if(turn ==2) {
+			ChessProject.callAlphaBeta();
+			turn=0;
+			repaint();
+		}
 		// TODO Auto-generated method stub
 	}
 
@@ -124,6 +137,7 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
+		
 		if(e.getX()<8*squareSize && e.getY()<8*squareSize) {
 			 newMouseX = e.getX();
 			 newMouseY = e.getY();
@@ -138,11 +152,9 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 				String possibleMovesUser = ChessProject.possibleMoves();
 				if(possibleMovesUser.replaceAll(dragMove,"").length() < possibleMovesUser.length()) {
 					ChessProject.makeMove(dragMove);
-					ChessProject.flipBoard();
-					ChessProject.makeMove(ChessProject.alphaBeta(ChessProject.globalDepth, 100000, -100000, "", 0));
-					ChessProject.flipBoard();
+					turn =1;
+
 					repaint();
-					turn = 1;
 
 				}
 				 

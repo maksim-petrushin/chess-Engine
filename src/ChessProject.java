@@ -49,7 +49,9 @@ public class ChessProject {
 	}
 	public static void callAlphaBeta() {
 
-		f.repaint();
+		flipBoard();
+		makeMove(alphaBeta(globalDepth, 100000, -100000, "", 0 ));
+		flipBoard();
 	}
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) {
 		String list = possibleMoves();

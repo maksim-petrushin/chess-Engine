@@ -4,6 +4,41 @@ import java.util.*;
 public class ChessProject {
 	
 	static String chessBoard[][]= {
+			
+			/*
+			//midgame puzzle 1
+			{" ","a","r"," "," "," ","k","r"},
+			{"p","p","p"," "," "," ","b","p"},
+			{" "," ","k"," "," ","q"," "," "},
+			{" ","Q"," ","p"," "," "," ","b"},
+			{" "," "," "," ","p"," "," ","K"},
+			{" "," ","K"," ","P"," ","B","P"},
+			{"P","P","P","A"," ","P","P"," "},
+			{"R"," "," "," "," ","B"," ","R"},
+			*/
+			/*
+			//midgame puzzle 2
+			{"r"," "," ","a"," "," "," ","r"},
+			{"p","p","p"," "," ","p","p","p"},
+			{" "," "," "," ","p"," "," "," "},
+			{" "," "," ","p"," ","b"," "," "},
+			{" "," ","P","P","k","B"," "," "},
+			{"q","k","P"," ","P","K"," "," "},
+			{"P"," ","R"," "," ","P","P","P"},
+			{"A"," "," "," ","Q","B"," ","R"},
+			*/
+			/* // endgame 
+			{" "," "," ","b"," "," "," "," "},
+			{" "," "," "," "," "," ","q"," "},
+			{" "," "," "," "," "," "," "," "},
+			{" "," "," "," "," "," "," "," "},
+			{" "," "," "," "," "," "," ","K"},
+			{" "," "," "," "," ","a"," "," "},
+			{" "," "," "," "," "," "," ","A"},
+			{" "," "," "," "," "," "," "," "},
+			*/
+			
+				//starting board	
 			{"r","k","b","q","a","b","k","r"},
 			{"p","p","p","p","p","p","p","p"},
 			{" "," "," "," "," "," "," "," "},
@@ -14,7 +49,7 @@ public class ChessProject {
 			{"R","K","B","Q","A","B","K","R"},
 	};
 	static int globalDepth = 5;
-	static int maxetIsWhite = 0; 
+	static int maxetIsWhite = 1; 
 	static int kingPositionC=0, kingPositionL=0;
 	static JFrame f = new JFrame("Engine Maxet");
 	public static void main(String[] args) {
@@ -36,8 +71,8 @@ public class ChessProject {
 		f.setVisible(true);
 		f.repaint();
 		//if(maxetIsWhite == 1) {	
-		//	makeMove(alphaBeta(globalDepth, 1000000, -1000000, "", 0));
-		//	flipBoard();
+			
+		//	callAlphaBeta();
 			
 		//	f.repaint();
 			
@@ -47,16 +82,42 @@ public class ChessProject {
 		sc.close();
 
 	}
+	public static String sortMoves(String list) {
+		int [] score = new int[list.length()/5];
+		
+		for(int i=0; i<list.length(); i+=5) {
+			makeMove(list.substring(i,i+5));
+			score[i/5] = -Rating.rating(-1, 0);
+			undoMove(list.substring(i,i+5));
+		}
+		
+		String newListA="", newListB=list;
+		for(int i=0; i<Math.min(6, list.length()/5); i++) {
+			int max = -100000000, maxLocation =0;
+			
+			for(int j=0; j<list.length()/5; j++) {
+				if(score[j]>max) {max = score[j]; maxLocation = j;}
+			}
+			score[maxLocation]=-100000000;
+			newListA += list.substring(maxLocation*5, maxLocation*5+5);
+			newListB = newListB.replace(list.substring(maxLocation*5, maxLocation*5+5), "");
+			
+		}	
+		return newListA+newListB;
+	}
 	public static void callAlphaBeta() {
-
 		flipBoard();
-		makeMove(alphaBeta(globalDepth, 100000, -100000, "", 0 ));
+		long startTime = System.currentTimeMillis();
+		makeMove(alphaBeta(globalDepth, 100000000, -100000000, "", 0 ));
+		long endTime = System.currentTimeMillis();
 		flipBoard();
+		System.out.println("move time: "+(endTime - startTime));
 	}
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) {
 		String list = possibleMoves();
 		if(depth == 0 || list.length()==0) {return move+(Rating.rating(list.length(), depth)*(player*2-1));}
-		//sort later
+		list = sortMoves(list);
+		
 		player = 1-player;
 		int i;
 		for( i=0; i<list.length();i+=5) {

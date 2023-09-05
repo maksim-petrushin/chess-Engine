@@ -8,13 +8,13 @@ public class Rating {
 		counter+=rateMovability(list, depth, material);
 		counter+=ratePositional();
 		
-		ChessProject.flipBoard();
+		Moves.flipBoard();
 		material = rateMaterial();
 		counter-=material;
 		counter-=rateAttack();
 		counter-=rateMovability(list, depth, material);
 		counter-=ratePositional();
-		ChessProject.flipBoard();
+		Moves.flipBoard();
 		
 		return -(counter+depth*50);
 	}
@@ -23,7 +23,7 @@ public class Rating {
 		int counter = 0, bishopCounter =0;
 		
 		for(int i =0; i<64; i++) {
-			switch(ChessProject.chessBoard[i/8][i%8]) {
+			switch(ChessProject.board[i/8][i%8]) {
 			case "P": counter+=100;
 			break;
 			case "R": counter+=500;
@@ -32,7 +32,7 @@ public class Rating {
 			break;
 			case "B": bishopCounter+=1;
 			break;
-			case "K": counter+=300;
+			case "N": counter+=300;
 			break;
 			}
 		}
@@ -52,23 +52,23 @@ public class Rating {
 	
 	public static int rateAttack() {
 		int counter = 0;
-		int tempPositionC = ChessProject.kingPositionC;
+		int tempWhiteKing = ChessProject.whiteKing;
 		for(int i =0; i<64; i++) {
-			switch(ChessProject.chessBoard[i/8][i%8]) {
-			case "P": ChessProject.kingPositionC = i; if(!ChessProject.kingSafe()) {counter -=64;}
+			switch(ChessProject.board[i/8][i%8]) {
+			case "P": ChessProject.whiteKing = i; if(!Moves.kingSafe()) {counter -=64;}
 			break;
-			case "R": ChessProject.kingPositionC = i; if(!ChessProject.kingSafe()) {counter -=500;}
+			case "R": ChessProject.whiteKing = i; if(!Moves.kingSafe()) {counter -=500;}
 			break;
-			case "Q": ChessProject.kingPositionC = i; if(!ChessProject.kingSafe()) {counter -=300;}
+			case "Q": ChessProject.whiteKing = i; if(!Moves.kingSafe()) {counter -=300;}
 			break;
-			case "B": ChessProject.kingPositionC = i; if(!ChessProject.kingSafe()) {counter -=300;}
+			case "B": ChessProject.whiteKing = i; if(!Moves.kingSafe()) {counter -=300;}
 			break;
-			case "K": ChessProject.kingPositionC = i; if(!ChessProject.kingSafe()) {counter -=900;}
+			case "N": ChessProject.whiteKing = i; if(!Moves.kingSafe()) {counter -=900;}
 			break;
 			}
 		}
-		ChessProject.kingPositionC = tempPositionC;
-		if(!ChessProject.kingSafe()) {
+		ChessProject.whiteKing = tempWhiteKing;
+		if(!Moves.kingSafe()) {
 			counter =200;
 		}
 		
@@ -79,7 +79,7 @@ public class Rating {
 		int counter=0;
 		counter +=listLength; // 5 points per valid move
 		if(listLength ==0) {//checkmate or stalemate
-			if(!ChessProject.kingSafe()) {//checkmate
+			if(!Moves.kingSafe()) {//checkmate
 				counter+=-200000*depth;
 			}
 			else {//stalemate

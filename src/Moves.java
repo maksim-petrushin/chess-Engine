@@ -5,28 +5,44 @@ public class Moves {
 	//TODO: Delete vvv
 	
 	public static void makeMove(String move, int side) {
+		ChessProject.moveHistory += move.substring(0,5);
 		if(side == 1) {
-			if(move.charAt(4)!= 'P') {
+			if(move.charAt(4)!= 'P' && move.charAt(4)!= 'C') {
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] 
 				= ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))];
 				ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = " ";
 				if("K".equals(ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))])) {
 					ChessProject.whiteKing = 8*Character.getNumericValue(move.charAt(2))+Character.getNumericValue(move.charAt(3));
-					ChessProject.whiteKingMoved = 1;
+					ChessProject.whiteCastlePossible = 0;
 				}
 			}else if(move.charAt(4)== 'P') {//pawn promotion
 				ChessProject.board[1][Character.getNumericValue(move.charAt(0))]=" ";
 				ChessProject.board[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(3));
-			}	
+			}else {//castle
+				if(move.charAt(3)== '2') {//queen-side castle
+					ChessProject.board[7][4] =" ";
+					ChessProject.board[7][2] ="K";
+					ChessProject.board[7][3] ="R";
+					ChessProject.board[7][0] =" ";
+					ChessProject.whiteKing = 58;
+					
+				}else {//king-side castle
+					ChessProject.board[7][4] =" ";
+					ChessProject.board[7][6] ="K";
+					ChessProject.board[7][5] ="R";
+					ChessProject.board[7][7] =" ";
+					ChessProject.whiteKing = 62;
+				}
+			}
 		}
 		else {
-			if(move.charAt(4)!= 'p') {
+			if(move.charAt(4)!= 'p' ) {
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] 
 				= ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))];
 				ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = " ";
 				if("k".equals(ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))])) {
 					ChessProject.blackKing = 8*Character.getNumericValue(move.charAt(2))+Character.getNumericValue(move.charAt(3));
-					ChessProject.blackKingMoved = 1;
+					ChessProject.blackCastlePossible = 0;
 				}
 			}
 			else if(move.charAt(4)== 'p') {//pawn promotion
@@ -40,18 +56,34 @@ public class Moves {
 	}
 	
 	public static void undoMove(String move, int side) {
+		ChessProject.moveHistory = ChessProject.moveHistory.substring(0, ChessProject.moveHistory.length() - 5);
 		if(side == 1) {
-			if(move.charAt(4)!= 'P'){
+			if(move.charAt(4)!= 'P' && move.charAt(4)!= 'C'){
 				ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))]
 				= ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))];
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = String.valueOf(move.charAt(4));
 				if("K".equals(ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))])) {
 					ChessProject.whiteKing = 8*Character.getNumericValue(move.charAt(0))+Character.getNumericValue(move.charAt(1));
-					ChessProject.whiteKingMoved = 0;
+					ChessProject.whiteCastlePossible = 1;
 				}
 			}else if(move.charAt(4)== 'P') {//pawn promotion
 				ChessProject.board[1][Character.getNumericValue(move.charAt(0))]="P";
 				ChessProject.board[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(2));	
+			}else {//castle
+				if(move.charAt(3)== '2') {//queen-side castle
+					ChessProject.board[7][4] ="K";
+					ChessProject.board[7][2] =" ";
+					ChessProject.board[7][3] =" ";
+					ChessProject.board[7][0] ="R";
+					ChessProject.whiteKing = 60;
+					
+				}else {//king-side castle
+					ChessProject.board[7][4] ="K";
+					ChessProject.board[7][6] =" ";
+					ChessProject.board[7][5] =" ";
+					ChessProject.board[7][7] ="R";
+					ChessProject.whiteKing = 60;
+				}
 			}	
 		}
 		else {
@@ -61,7 +93,7 @@ public class Moves {
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = String.valueOf(move.charAt(4));
 				if("k".equals(ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))])) {
 					ChessProject.blackKing = 8*Character.getNumericValue(move.charAt(0))+Character.getNumericValue(move.charAt(1));
-					ChessProject.blackKingMoved = 0;
+					ChessProject.blackCastlePossible = 1;
 				}
 			}else if(move.charAt(4)== 'p') {//pawn promotion
 				ChessProject.board[6][Character.getNumericValue(move.charAt(0))]="p";
@@ -309,9 +341,35 @@ public class Moves {
 						ChessProject.board[r-1+j/3][c-1+j%3]=oldPiece;
 						ChessProject.whiteKing = kingTemp;
 					}
-					}catch(Exception e) {
+					}catch(Exception e) {}
+				}
+			}
+			int kingMoved = 0, kingRookMoved = 0, queenRookMoved= 0;
+			for( i=0; i<ChessProject.moveHistory.length();i+=5) {
+					String currentMove = ChessProject.moveHistory.substring(i,i+5);
+					if(currentMove.startsWith("74")) {
+						kingMoved = 1;
+						break;
+					}
+					else {
+						if(currentMove.startsWith("70")) {
+							queenRookMoved = 1;
+						}
+						if(currentMove.startsWith("77")) {
+							kingRookMoved = 1;
+						}
+						if(queenRookMoved == 1 && kingRookMoved == 1) {
+							break;
+						}
 						
 					}
+			}
+			if(kingMoved == 0) {
+				if(queenRookMoved == 0 && " ".equals(ChessProject.board[7][1]) && " ".equals(ChessProject.board[7][2]) && " ".equals(ChessProject.board[7][3])) {
+					list+= "7472C";
+				}
+				if(kingRookMoved == 0 && " ".equals(ChessProject.board[7][5]) && " ".equals(ChessProject.board[7][6])) {
+					list+= "7476C";
 				}
 			}
 		}

@@ -158,17 +158,23 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 				 if(newMouseY/squareSize ==0 && mouseY/squareSize == 1 && "P".equals(ChessProject.board[mouseY/squareSize][mouseX/squareSize])) {
 					 dragMove = ""+ mouseX/squareSize + newMouseX/squareSize+ChessProject.board[newMouseY/squareSize][newMouseX/squareSize]+"QP";
 				 }
+				 else if(mouseY/squareSize ==7 && mouseX/squareSize == 4 && newMouseY/squareSize ==7 && newMouseX/squareSize == 6) {
+					 dragMove = "7476C";
+					 
+				 }
+				 else if(mouseY/squareSize ==7 && mouseX/squareSize == 4 && newMouseY/squareSize ==7 && newMouseX/squareSize == 2) {
+					 dragMove = "7472C";
+					 
+				 }
 				 else {
 					 dragMove = ""+mouseY/squareSize + mouseX/squareSize +newMouseY/squareSize + newMouseX/squareSize+ChessProject.board[newMouseY/squareSize][newMouseX/squareSize];
 				 }
 				String possibleMovesUser = Moves.possibleMoves(1);
-				System.out.println(possibleMovesUser);
 				if(possibleMovesUser.replaceAll(dragMove,"").length() < possibleMovesUser.length()) {
 					if(ChessProject.board[Character.getNumericValue(dragMove.charAt(0))][Character.getNumericValue(dragMove.charAt(1))]=="K") {
-						ChessProject.whiteKingMoved = 1;
+						ChessProject.whiteCastlePossible = 0;
 					}
 					Moves.makeMove(dragMove, 1);
-					System.out.println(dragMove);
 					turn =1;
 
 					repaint();

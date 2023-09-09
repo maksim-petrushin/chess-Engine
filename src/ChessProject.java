@@ -62,9 +62,10 @@ public class ChessProject {
 	static int globalDepth = 4;
 	static int maxetIsWhite = 1;
 	static int isWhitesTurn = 1;
-	static int whiteKingMoved = 0;
-	static int blackKingMoved = 0;
+	static int whiteCastlePossible = 1;
+	static int blackCastlePossible = 1;
 	static int whiteKing=60, blackKing=4;
+	static String moveHistory ="";
 	static JFrame frame = new JFrame("Engine Maxet");
 	public static void main(String[] args) {
 		//System.out.print("Is Engine Maxet White? (1 - yes, 0 - no): ");
@@ -94,7 +95,8 @@ public class ChessProject {
 		long startTime = System.currentTimeMillis();
 		String move = alphaBeta(globalDepth, 100000000, -100000000, "", 0 );
 		Moves.makeMove(move, 0);
-		System.out.println(move);
+		
+		System.out.println(moveHistory);
 		long endTime = System.currentTimeMillis();
 		System.out.println("move time: "+(endTime - startTime));
 	}

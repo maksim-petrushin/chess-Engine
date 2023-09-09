@@ -79,6 +79,7 @@ public class Moves {
 			for(int i=0; i<64; i++) {
 				switch(ChessProject.board[i/8][i%8]) {
 				case "P":
+					
 					list+=possibleP(i, side);
 					break;
 				case "R":
@@ -99,10 +100,6 @@ public class Moves {
 				default:
 					break;
 				}
-				if(!" ".equals(ChessProject.board[i/8][i%8])) {
-					System.out.print(ChessProject.board[i/8][i%8]+"  ");
-					System.out.println(list);
-				}
 				
 	
 			}
@@ -114,7 +111,7 @@ public class Moves {
 				case "p":
 					list+=possibleP(i, side);
 					break;
-				/*			
+						
 				case "r":
 					list+=possibleR(i, side);
 					break; 
@@ -122,8 +119,6 @@ public class Moves {
 				case "n":
 					list+=possibleN(i, side);
 					break; 
-				
-				
 				
 				case "b":
 					list+=possibleB(i, side);
@@ -139,7 +134,6 @@ public class Moves {
 					list+=possibleQ(i, side);
 					break;
 					
-				*/
 				default:
 					break;
 				}
@@ -227,8 +221,8 @@ public class Moves {
 			for(int j=-1; j<=1; j+=2) {
 				//capture
 					try{
-						if(i<=48 && Character.isUpperCase(ChessProject.board[r-1][c+j].charAt(0))){
-							oldPiece = ChessProject.board[r-1][c+j];
+						if(i<=48 && Character.isUpperCase(ChessProject.board[r+1][c+j].charAt(0))){
+							oldPiece = ChessProject.board[r+1][c+j];
 							ChessProject.board[r][c] = " ";
 							ChessProject.board[r+1][c+j] = "p";
 							if(kingSafe(side)) {
@@ -239,10 +233,10 @@ public class Moves {
 						}
 					}catch(Exception e) {}
 					try{//promotion
-						if(i>48 && Character.isUpperCase(ChessProject.board[r-1][c+j].charAt(0))){
+						if(i>48 && Character.isUpperCase(ChessProject.board[r+1][c+j].charAt(0))){
 							String[] temp = {"q","n", "r", "b"};
 							for(int k=0; k<4;k++) {
-								oldPiece = ChessProject.board[r-1][c+j];
+								oldPiece = ChessProject.board[r+1][c+j];
 								ChessProject.board[r][c] = " ";
 								ChessProject.board[r+1][c+j] = temp[k];
 								if(kingSafe(side)) {
@@ -255,7 +249,7 @@ public class Moves {
 					}catch(Exception e) {}
 			}
 			try{//move one up
-				if(i<=48 && " ".equals(ChessProject.board[r-1][c])){
+				if(i<=48 && " ".equals(ChessProject.board[r+1][c])){
 						ChessProject.board[r][c] = " ";
 						ChessProject.board[r+1][c] = "p";
 						if(kingSafe(side)) {
@@ -266,7 +260,7 @@ public class Moves {
 				}
 			}catch(Exception e) {}
 			try{//promotion and no capture
-				if(i>48 && " ".equals(ChessProject.board[r-1][c])){
+				if(i>48 && " ".equals(ChessProject.board[r+1][c])){
 					String[] temp = {"q","n", "r", "b"};
 					for(int k=0; k<4;k++) {
 						ChessProject.board[r][c] = " ";
@@ -280,7 +274,7 @@ public class Moves {
 				}
 			}catch(Exception e) {}
 			try{//move two up
-				if(i<16 && " ".equals(ChessProject.board[r-1][c]) && " ".equals(ChessProject.board[r-2][c])){
+				if(i<16 && " ".equals(ChessProject.board[r+1][c]) && " ".equals(ChessProject.board[r+2][c])){
 						ChessProject.board[r][c] = " ";
 						ChessProject.board[r+2][c] = "p";
 						if(kingSafe(side)) {
@@ -661,8 +655,6 @@ public class Moves {
 						}
 						if("b".equals(ChessProject.board[ChessProject.whiteKing/8+temp*j][ChessProject.whiteKing%8+temp*k]) || 
 							"q".equals(ChessProject.board[ChessProject.whiteKing/8+temp*j][ChessProject.whiteKing%8+temp*k])) {
-							System.out.println("bishop or queen");
-							System.out.println(ChessProject.whiteKing);
 							return false;
 						}	
 					}catch(Exception e) {}
@@ -679,7 +671,6 @@ public class Moves {
 					
 					if("r".equals(ChessProject.board[ChessProject.whiteKing/8][ChessProject.whiteKing%8+temp*i]) ||
 						"q".equals(ChessProject.board[ChessProject.whiteKing/8][ChessProject.whiteKing%8+temp*i])) {
-						System.out.println("rook or queen");
 						return false;
 					}	
 				}catch (Exception e) {}
@@ -691,7 +682,6 @@ public class Moves {
 					
 					if("r".equals(ChessProject.board[ChessProject.whiteKing/8+temp*i][ChessProject.whiteKing%8]) ||
 						"q".equals(ChessProject.board[ChessProject.whiteKing/8+temp*i][ChessProject.whiteKing%8])) {
-						System.out.println("rook or queen");
 						return false;
 					}	
 				}catch (Exception e) {}
@@ -702,13 +692,11 @@ public class Moves {
 						for(int k=-1;k<=1;k+=2) {
 							try {
 								if("n".equals(ChessProject.board[ChessProject.whiteKing/8+j][ChessProject.whiteKing%8+2*k])){
-									System.out.println("knight");
 									return false;
 								}	
 							}catch(Exception e) {}
 							try {
 								if("n".equals(ChessProject.board[ChessProject.whiteKing/8+2*j][ChessProject.whiteKing%8+k])){
-									System.out.println("knight");
 									return false;
 								}	
 							}catch(Exception e) {}
@@ -719,13 +707,11 @@ public class Moves {
 					if(ChessProject.whiteKing>=16) {
 						try {
 							if("p".equals(ChessProject.board[ChessProject.whiteKing/8-1][ChessProject.whiteKing%8-1])) {
-								System.out.println("pawn");
 								return false;
 							}
 						}catch(Exception e) {}
 						try {
 							if("p".equals(ChessProject.board[ChessProject.whiteKing/8-1][ChessProject.whiteKing%8+1])) {
-								System.out.println("pawn");
 								return false;
 							}
 						}catch(Exception e) {}
@@ -738,8 +724,6 @@ public class Moves {
 							}
 							try {
 								if("k".equals(ChessProject.board[ChessProject.whiteKing/8+j][ChessProject.whiteKing%8+k])){
-									System.out.println("king");
-									System.out.println(ChessProject.whiteKing);
 									return false;
 								}	
 							}catch(Exception e) {}

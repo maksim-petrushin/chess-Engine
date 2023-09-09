@@ -51,7 +51,7 @@ public class ChessProject {
 			
 				//starting board	
 			{"r","n","b","q","k","b","n","r"},
-			{" ","p","p"," "," ","p","p"," "},
+			{"p","p","p","p","p","p","p","p"},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
@@ -59,7 +59,7 @@ public class ChessProject {
 			{"P","P","P","P","P","P","P","P"},
 			{"R","N","B","Q","K","B","N","R"},
 	};
-	static int globalDepth = 1;
+	static int globalDepth = 4;
 	static int maxetIsWhite = 1;
 	static int isWhitesTurn = 1;
 	static int whiteKingMoved = 0;
@@ -83,8 +83,6 @@ public class ChessProject {
 		for(int i = 0; i< 8; i++) {
 			System.out.println(Arrays.toString(ChessProject.board[i]));
 		}
-		System.out.println(Moves.kingSafe(0));
-		System.out.println(Moves.possibleMoves(0));
 		//	frame.repaint();
 			
 		//}

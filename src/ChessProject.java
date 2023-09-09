@@ -6,6 +6,7 @@ public class ChessProject {
 	static String board[][]= {
 			
 			//castle check 1
+			/*
 			{"r"," "," "," ","k"," "," ","r"},
 			{"p"," "," "," "," "," ","Q","p"},
 			{"P"," "," ","P","P"," "," ","P"},
@@ -13,8 +14,7 @@ public class ChessProject {
 			{"P"," "," "," "," "," "," ","P"},
 			{"P"," "," "," "," "," "," ","P"},
 			{"P"," "," "," "," ","Q"," ","P"},
-			{"R"," "," "," ","K"," "," ","R"},
-			
+			{"R"," "," "," ","K"," "," ","R"},*/
 			
 			/*
 			//midgame puzzle 1
@@ -49,39 +49,42 @@ public class ChessProject {
 			{" "," "," "," "," "," "," "," "},
 			*/
 			
-			/*	//starting board	
+				//starting board	
 			{"r","n","b","q","k","b","n","r"},
-			{"p","p","p","p","p","p","p","p"},
+			{" ","p","p"," "," ","p","p"," "},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
 			{"P","P","P","P","P","P","P","P"},
 			{"R","N","B","Q","K","B","N","R"},
-			*/
 	};
-	static int globalDepth = 3;
-	static int maxetIsWhite = 1; 
+	static int globalDepth = 1;
+	static int maxetIsWhite = 1;
+	static int isWhitesTurn = 1;
 	static int whiteKingMoved = 0;
 	static int blackKingMoved = 0;
-	static int whiteKing=0, blackKing=0;
+	static int whiteKing=60, blackKing=4;
 	static JFrame frame = new JFrame("Engine Maxet");
 	public static void main(String[] args) {
 		//System.out.print("Is Engine Maxet White? (1 - yes, 0 - no): ");
 		Scanner sc = new Scanner(System.in);
 		//maxetIsWhite = sc.nextInt();
-		whiteKing = 60;	
-		blackKing = 4;
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		UserInterface ui = new UserInterface();
 		frame.add(ui);
 		frame.setSize(600, 600);
 		frame.setVisible(true);
 		frame.repaint();
+		
 		//if(maxetIsWhite == 1) {	
 			
 		//	callAlphaBeta();
-			
+		for(int i = 0; i< 8; i++) {
+			System.out.println(Arrays.toString(ChessProject.board[i]));
+		}
+		System.out.println(Moves.kingSafe(0));
+		System.out.println(Moves.possibleMoves(0));
 		//	frame.repaint();
 			
 		//}
@@ -90,30 +93,27 @@ public class ChessProject {
 	}
 
 	public static void callAlphaBeta() {
-		Moves.flipBoard();
 		long startTime = System.currentTimeMillis();
 		String move = alphaBeta(globalDepth, 100000000, -100000000, "", 0 );
-		System.out.println(Moves.possibleMoves());
-		System.out.println("");
+		Moves.makeMove(move, 0);
 		System.out.println(move);
-		Moves.makeMove(move);
 		long endTime = System.currentTimeMillis();
-		Moves.flipBoard();
 		System.out.println("move time: "+(endTime - startTime));
 	}
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) {
-		String list = Moves.possibleMoves();
-		if(depth == 0 || list.length()==0) {return move+(Rating.rating(list.length(), depth)*(player*2-1));}
-		
+		String list = Moves.possibleMoves(player);
+		String listOp = Moves.possibleMoves(1-player);
+		if(depth == 0 || list.length()==0) {return move+(Rating.rating(list.length(),listOp.length(), depth, player)*(player*2-1));}
 		player = 1-player;
 		int i;
 		for( i=0; i<list.length();i+=5) {
-			Moves.makeMove(list.substring(i,i+5));
-			Moves.flipBoard();
+			
+			String currentMove = list.substring(i,i+5);
+			
+			Moves.makeMove(currentMove, 1-player);
 			String returnString = alphaBeta(depth-1, beta, alpha, list.substring(i,i+5), player);
 			int value = Integer.valueOf(returnString.substring(5));
-			Moves.flipBoard();
-			Moves.undoMove(list.substring(i,i+5));
+			Moves.undoMove(currentMove, 1-player);
 			if(player == 0 ) {
 				if(value <= beta) {beta = value; if(depth == globalDepth) {move = returnString.substring(0,5);}}
 			} else {

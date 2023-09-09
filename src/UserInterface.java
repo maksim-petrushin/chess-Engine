@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.Arrays;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -98,6 +99,9 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 		if(turn==1) {
 			turn =2;
 		}
+		//for(int i = 0; i< 8; i++) {
+		//	System.out.println(Arrays.toString(ChessProject.board[i]));
+		//}
 		
 
 		
@@ -124,7 +128,11 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+		if(e.getButton()== MouseEvent.BUTTON3) {
+			for(int i = 0; i< 8; i++) {
+				System.out.println(Arrays.toString(ChessProject.board[i]));
+			}
+		}
 		
 	}
 
@@ -144,24 +152,23 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 		if(e.getX()<8*squareSize && e.getY()<8*squareSize) {
 			 newMouseX = e.getX();
 			 newMouseY = e.getY();
+
 			 if(e.getButton()== MouseEvent.BUTTON1) {
 				 String dragMove;
 				 if(newMouseY/squareSize ==0 && mouseY/squareSize == 1 && "P".equals(ChessProject.board[mouseY/squareSize][mouseX/squareSize])) {
 					 dragMove = ""+ mouseX/squareSize + newMouseX/squareSize+ChessProject.board[newMouseY/squareSize][newMouseX/squareSize]+"QP";
-				 }else if("K".equals(ChessProject.board[mouseY/squareSize][mouseX/squareSize]) &&
-						 (newMouseX/squareSize == 6 && mouseX/squareSize == 4 ||
-						 newMouseX/squareSize == 2 && mouseX/squareSize == 4 ||
-						 newMouseX/squareSize == 5 && mouseX/squareSize == 3 ||
-						 newMouseX/squareSize == 1 && mouseX/squareSize == 3)) {
-					 dragMove = ""+mouseY/squareSize + mouseX/squareSize +newMouseY/squareSize + newMouseX/squareSize+"C";
 				 }
 				 else {
 					 dragMove = ""+mouseY/squareSize + mouseX/squareSize +newMouseY/squareSize + newMouseX/squareSize+ChessProject.board[newMouseY/squareSize][newMouseX/squareSize];
 				 }
-				String possibleMovesUser = Moves.possibleMoves();
+				String possibleMovesUser = Moves.possibleMoves(1);
+				System.out.println(possibleMovesUser);
 				if(possibleMovesUser.replaceAll(dragMove,"").length() < possibleMovesUser.length()) {
-				
-					Moves.makeMove(dragMove);
+					if(ChessProject.board[Character.getNumericValue(dragMove.charAt(0))][Character.getNumericValue(dragMove.charAt(1))]=="K") {
+						ChessProject.whiteKingMoved = 1;
+					}
+					Moves.makeMove(dragMove, 1);
+					System.out.println(dragMove);
 					turn =1;
 
 					repaint();

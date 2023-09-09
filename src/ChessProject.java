@@ -6,16 +6,15 @@ public class ChessProject {
 	static String board[][]= {
 			
 			//castle check 1
-			/*
-			{"r"," "," "," ","k"," "," ","r"},
-			{"p"," "," "," "," "," ","Q","p"},
-			{"P"," "," ","P","P"," "," ","P"},
-			{"P"," "," "," "," "," "," ","P"},
-			{"P"," "," "," "," "," "," ","P"},
-			{"P"," "," "," "," "," "," ","P"},
-			{"P"," "," "," "," ","Q"," ","P"},
-			{"R"," "," "," ","K"," "," ","R"},*/
 			
+			{" "," "," "," ","k"," "," ","r"},
+			{"p"," ","P"," "," "," "," ","p"},
+			{"P"," "," "," ","P","P"," ","P"},
+			{"P"," "," "," "," "," "," ","P"},
+			{"P"," "," "," "," "," "," ","P"},
+			{"P"," "," "," "," "," "," ","P"},
+			{"P"," "," "," "," "," "," ","P"},
+			{"R"," "," "," ","K"," "," ","R"},
 			/*
 			//midgame puzzle 1
 			{" ","k","r"," "," "," ","n","r"},
@@ -26,8 +25,7 @@ public class ChessProject {
 			{" "," ","N"," ","P"," ","B","P"},
 			{"P","P","P","K"," ","P","P"," "},
 			{"R"," "," "," "," ","B"," ","R"},
-			*/
-			/*
+
 			//midgame puzzle 2
 			{"r"," "," ","k"," "," "," ","r"},
 			{"p","p","p"," "," ","p","p","p"},
@@ -37,8 +35,8 @@ public class ChessProject {
 			{"q","n","P"," ","P","N"," "," "},
 			{"P"," ","R"," "," ","P","P","P"},
 			{"K"," "," "," ","Q","B"," ","R"},
-			*/
-			/* // endgame 
+			/*
+			 // endgame 
 			{" "," "," ","b"," "," "," "," "},
 			{" "," "," "," "," "," ","q"," "},
 			{" "," "," "," "," "," "," "," "},
@@ -47,7 +45,7 @@ public class ChessProject {
 			{" "," "," "," "," ","k"," "," "},
 			{" "," "," "," "," "," "," ","K"},
 			{" "," "," "," "," "," "," "," "},
-			*/
+			
 			
 				//starting board	
 			{"r","n","b","q","k","b","n","r"},
@@ -58,13 +56,15 @@ public class ChessProject {
 			{" "," "," "," "," "," "," "," "},
 			{"P","P","P","P","P","P","P","P"},
 			{"R","N","B","Q","K","B","N","R"},
+			*/
 	};
 	static int globalDepth = 4;
 	static int maxetIsWhite = 1;
 	static int isWhitesTurn = 1;
 	static int whiteCastlePossible = 1;
 	static int blackCastlePossible = 1;
-	static int whiteKing=60, blackKing=4;
+	static int debuggingPositionCount = 0;
+	static int whiteKing, blackKing;
 	static String moveHistory ="";
 	static JFrame frame = new JFrame("Engine Maxet");
 	public static void main(String[] args) {
@@ -77,6 +77,22 @@ public class ChessProject {
 		frame.setSize(600, 600);
 		frame.setVisible(true);
 		frame.repaint();
+		for(int i=0; i<64; i++) {
+			switch(ChessProject.board[i/8][i%8]) {
+				case "K":
+					whiteKing = i;
+					break;
+				case "k":
+					blackKing = i;
+					break;
+				default:
+					break;
+			}
+			
+
+		}
+		System.out.println(whiteKing);
+		System.out.println(blackKing);
 		
 		//if(maxetIsWhite == 1) {	
 			
@@ -93,12 +109,18 @@ public class ChessProject {
 
 	public static void callAlphaBeta() {
 		long startTime = System.currentTimeMillis();
+		debuggingPositionCount = 0;
 		String move = alphaBeta(globalDepth, 100000000, -100000000, "", 0 );
 		Moves.makeMove(move, 0);
 		
-		System.out.println(moveHistory);
+		//System.out.println(moveHistory);
 		long endTime = System.currentTimeMillis();
+		
 		System.out.println("move time: "+(endTime - startTime));
+		System.out.println(debuggingPositionCount);
+		System.out.println("");
+		
+		
 	}
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) {
 		String list = Moves.possibleMoves(player);

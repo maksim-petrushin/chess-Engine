@@ -1,10 +1,11 @@
-
+import java.util.Arrays;
 
 public class Moves {
 	
 	//TODO: Delete vvv
 	
 	public static void makeMove(String move, int side) {
+		//ChessProject.debuggingPositionCount++;
 		ChessProject.moveHistory += move.substring(0,5);
 		if(side == 1) {
 			if(move.charAt(4)!= 'P' && move.charAt(4)!= 'C') {
@@ -36,7 +37,7 @@ public class Moves {
 			}
 		}
 		else {
-			if(move.charAt(4)!= 'p' ) {
+			if(move.charAt(4)!= 'p' && move.charAt(4)!= 'c') {
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] 
 				= ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))];
 				ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = " ";
@@ -48,11 +49,30 @@ public class Moves {
 			else if(move.charAt(4)== 'p') {//pawn promotion
 				ChessProject.board[6][Character.getNumericValue(move.charAt(0))]=" ";
 				ChessProject.board[7][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(3));
+			}else {//castle
+				if(move.charAt(3)== '2') {//queen-side castle
+					ChessProject.board[0][4] =" ";
+					ChessProject.board[0][2] ="k";
+					ChessProject.board[0][3] ="r";
+					ChessProject.board[0][0] =" ";
+					ChessProject.blackKing = 2;
+					
+				}else {//king-side castle
+					ChessProject.board[0][4] =" ";
+					ChessProject.board[0][6] ="k";
+					ChessProject.board[0][5] ="r";
+					ChessProject.board[0][7] =" ";
+					ChessProject.blackKing = 6;
+				}
 			}
 			
 		}
-		
-		
+		//debugging block 
+		//System.out.println("move: "+ move+" side: "+side);
+		//for(int i = 0; i< 8; i++) {
+		//	System.out.println(Arrays.toString(ChessProject.board[i]));
+		//}
+		//System.out.println("");
 	}
 	
 	public static void undoMove(String move, int side) {
@@ -87,7 +107,7 @@ public class Moves {
 			}	
 		}
 		else {
-			if(move.charAt(4)!= 'p'){
+			if(move.charAt(4)!= 'p' && move.charAt(4)!= 'c'){
 				ChessProject.board[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))]
 				= ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))];
 				ChessProject.board[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = String.valueOf(move.charAt(4));
@@ -98,10 +118,25 @@ public class Moves {
 			}else if(move.charAt(4)== 'p') {//pawn promotion
 				ChessProject.board[6][Character.getNumericValue(move.charAt(0))]="p";
 				ChessProject.board[7][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(2));	
+			}else {//castle
+				if(move.charAt(3)== '2') {//queen-side castle
+					ChessProject.board[0][4] ="k";
+					ChessProject.board[0][2] =" ";
+					ChessProject.board[0][3] =" ";
+					ChessProject.board[0][0] ="r";
+					ChessProject.blackKing = 4;
+					
+				}else {//king-side castle
+					ChessProject.board[0][4] ="k";
+					ChessProject.board[0][6] =" ";
+					ChessProject.board[0][5] =" ";
+					ChessProject.board[0][7] ="r";
+					ChessProject.blackKing = 4;
+				}
 			}	
 			
 		}
-		
+
 	}
 	
 	public static String possibleMoves(int side) { //side 1 - white, 0 - black
@@ -347,15 +382,15 @@ public class Moves {
 			int kingMoved = 0, kingRookMoved = 0, queenRookMoved= 0;
 			for( i=0; i<ChessProject.moveHistory.length();i+=5) {
 					String currentMove = ChessProject.moveHistory.substring(i,i+5);
-					if(currentMove.startsWith("74")) {
+					if(currentMove.startsWith("74") || currentMove.contains("74K")) {
 						kingMoved = 1;
 						break;
 					}
 					else {
-						if(currentMove.startsWith("70")) {
+						if(currentMove.startsWith("70") || currentMove.contains("70R")) {
 							queenRookMoved = 1;
 						}
-						if(currentMove.startsWith("77")) {
+						if(currentMove.startsWith("77") || currentMove.contains("77R")) {
 							kingRookMoved = 1;
 						}
 						if(queenRookMoved == 1 && kingRookMoved == 1) {
@@ -364,13 +399,27 @@ public class Moves {
 						
 					}
 			}
-			if(kingMoved == 0) {
+			
+			if(kingMoved == 0 && ChessProject.whiteKing == 60 && Moves.kingSafe(1)) {
 				if(queenRookMoved == 0 && " ".equals(ChessProject.board[7][1]) && " ".equals(ChessProject.board[7][2]) && " ".equals(ChessProject.board[7][3])) {
-					list+= "7472C";
+						ChessProject.whiteKing= 59;
+						if(Moves.kingSafe(1)) {
+							ChessProject.whiteKing= 58;
+							if(Moves.kingSafe(1)) {
+								list+= "7472C";
+						}
+					}	
 				}
 				if(kingRookMoved == 0 && " ".equals(ChessProject.board[7][5]) && " ".equals(ChessProject.board[7][6])) {
-					list+= "7476C";
+					ChessProject.whiteKing= 61;
+					if(Moves.kingSafe(1)) {
+						ChessProject.whiteKing= 62;
+						if(Moves.kingSafe(1)) {
+							list+= "7476C";
+					}
+				}	
 				}
+				ChessProject.whiteKing= 60;
 			}
 		}
 		else {
@@ -394,6 +443,47 @@ public class Moves {
 						
 					}
 				}
+			}
+			int kingMoved = 0, kingRookMoved = 0, queenRookMoved= 0;
+			for( i=0; i<ChessProject.moveHistory.length();i+=5) {
+					String currentMove = ChessProject.moveHistory.substring(i,i+5);
+					if(currentMove.startsWith("04") || currentMove.contains("04k")) {
+						kingMoved = 1;
+						break;
+					}
+					else {
+						if(currentMove.startsWith("00") || currentMove.contains("00r")) {
+							queenRookMoved = 1;
+						}
+						if(currentMove.startsWith("07") || currentMove.contains("07r") ) {
+							kingRookMoved = 1;
+						}
+						if(queenRookMoved == 1 && kingRookMoved == 1) {
+							break;
+						}
+						
+					}
+			}
+			if(kingMoved == 0 && ChessProject.blackKing == 4 && Moves.kingSafe(0)) {
+				if(queenRookMoved == 0 && " ".equals(ChessProject.board[0][1]) && " ".equals(ChessProject.board[0][2]) && " ".equals(ChessProject.board[0][3])) {
+					ChessProject.blackKing= 3;
+					if(Moves.kingSafe(0)) {
+						ChessProject.blackKing= 2;
+						if(Moves.kingSafe(0)) {
+							list+= "0402c";
+						}
+					}
+				}
+				if(kingRookMoved == 0 && " ".equals(ChessProject.board[0][5]) && " ".equals(ChessProject.board[0][6])) {
+					ChessProject.blackKing= 5;
+					if(Moves.kingSafe(0)) {
+						ChessProject.blackKing= 6;
+						if(Moves.kingSafe(0)) {
+							list+= "0406c";
+						}
+					}	
+				}
+				ChessProject.blackKing= 4;
 			}
 			
 		}

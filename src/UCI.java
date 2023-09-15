@@ -1,37 +1,36 @@
 import java.util.Scanner;
 public class UCI {
     static String ENGINENAME="Maxet";
-    public static void uciCommunication() {
+    public static void uciCommunication(String inputString ) {
         Scanner input = new Scanner(System.in);
-        while (true)
-        {
-            String inputString=input.nextLine();
+            
             if ("uci".contains(inputString))
             {
             	greetingUCI();
             }
             else if (inputString.contains("debug on")) {
-            	//TODO
+            	//TODO:
             }
             else if (inputString.contains("debug off")) {
-            	//TODO
+            	//TODO:
             }
-            else if ("isready".contains(inputString))
+            else if (inputString.contains("isready"))
             {
                 isReady();
             }
             else if (inputString.contains("setoption"))
             {
-                //inputSetOption(inputString);
+                inputSetOption(inputString);
             }
             
-            else if ("ucinewgame".contains(inputString))
+            else if (inputString.contains("ucinewgame"))
             {
-                //inputUCINewGame();
+                inputUCINewGame();
             }
-            else if (inputString.contains("position"))
+            else if (inputString.contains("position startpos"))
             {
-                //inputPosition(inputString);
+            	inputUCINewGame();
+                buildPosition(inputString);
             }
             else if (inputString.contains("go"))
             {
@@ -41,11 +40,11 @@ public class UCI {
             {
                 //inputQuit();
             }
-            else if ("print".contains(inputString))
+            else if (inputString.contains("print"))
             {
                 //inputPrint();
             }
-        }
+            input.close();
         
     }
     public static void greetingUCI() {
@@ -55,149 +54,87 @@ public class UCI {
         System.out.println("uciok");
     }
     public static void inputSetOption(String inputString) {
-        //set options
+    	//TODO:
     }
     public static void isReady() {
          System.out.println("readyok");
     }
-    /*
+    
  
 
     public static void inputUCINewGame() {
-        //add code here
+        //TODO:
+    	String freshBoard[][] = {
+				//starting board	
+			{"r","n","b","q","k","b","n","r"},
+			{"p","p","p","p","p","p","p","p"},
+			{" "," "," "," "," "," "," "," "},
+			{" "," "," "," "," "," "," "," "},
+			{" "," "," "," "," "," "," "," "},
+			{" "," "," "," "," "," "," "," "},
+			{"P","P","P","P","P","P","P","P"},
+			{"R","N","B","Q","K","B","N","R"},
+			
+	};
+    	for(int i=0; i<64; i++) {
+    		ChessProject.board[i/8][i%8]=freshBoard[i/8][i%8];
+    	}
     }
-    public static void inputPosition(String input) {
-        input=input.substring(9).concat(" ");
-        if (input.contains("startpos ")) {
-            input=input.substring(9);
-            BoardGeneration.importFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        }
-        else if (input.contains("fen")) {
-            input=input.substring(4);
-            BoardGeneration.importFEN(input);
-        }
+    	
+    
+    public static void buildPosition(String input) {
         if (input.contains("moves")) {
             input=input.substring(input.indexOf("moves")+6);
+            int side = 1;
             while (input.length()>0)
             {
-                String moves;
-                if (UserInterface.WhiteToMove) {
-                    moves=Moves.possibleMovesW(UserInterface.WP,UserInterface.WN,UserInterface.WB,UserInterface.WR,UserInterface.WQ,UserInterface.WK,UserInterface.BP,UserInterface.BN,UserInterface.BB,UserInterface.BR,UserInterface.BQ,UserInterface.BK,UserInterface.EP,UserInterface.CWK,UserInterface.CWQ,UserInterface.CBK,UserInterface.CBQ);
-                } else {
-                    moves=Moves.possibleMovesB(UserInterface.WP,UserInterface.WN,UserInterface.WB,UserInterface.WR,UserInterface.WQ,UserInterface.WK,UserInterface.BP,UserInterface.BN,UserInterface.BB,UserInterface.BR,UserInterface.BQ,UserInterface.BK,UserInterface.EP,UserInterface.CWK,UserInterface.CWQ,UserInterface.CBK,UserInterface.CBQ);
-                }
-                algebraToMove(input,moves);
+                String moves = Moves.possibleMoves(side);
+                String maxetMove = algebraToMove(input,moves, side);
                 input=input.substring(input.indexOf(' ')+1);
+                side = 1 - side;
             }
         }
     }
-    public static void inputGo() {
-        String move;
-        if (UserInterface.WhiteToMove) {
-            move=Moves.possibleMovesW(UserInterface.WP,UserInterface.WN,UserInterface.WB,UserInterface.WR,UserInterface.WQ,UserInterface.WK,UserInterface.BP,UserInterface.BN,UserInterface.BB,UserInterface.BR,UserInterface.BQ,UserInterface.BK,UserInterface.EP,UserInterface.CWK,UserInterface.CWQ,UserInterface.CBK,UserInterface.CBQ);
-        } else {
-            move=Moves.possibleMovesB(UserInterface.WP,UserInterface.WN,UserInterface.WB,UserInterface.WR,UserInterface.WQ,UserInterface.WK,UserInterface.BP,UserInterface.BN,UserInterface.BB,UserInterface.BR,UserInterface.BQ,UserInterface.BK,UserInterface.EP,UserInterface.CWK,UserInterface.CWQ,UserInterface.CBK,UserInterface.CBQ);
-        }
-        int index=(int)(Math.floor(Math.random()*(move.length()/4))*4);
-        System.out.println("bestmove "+moveToAlgebra(move.substring(index,index+4)));
-    }
-    public static String moveToAlgebra(String move) {
-        String append="";
+    public static String algebraToMove(String input,String moves, int side) {
         int start=0,end=0;
-        if (Character.isDigit(move.charAt(3))) {//'regular' move
-            start=(Character.getNumericValue(move.charAt(0))*8)+(Character.getNumericValue(move.charAt(1)));
-            end=(Character.getNumericValue(move.charAt(2))*8)+(Character.getNumericValue(move.charAt(3)));
-        } else if (move.charAt(3)=='P') {//pawn promotion
-            if (Character.isUpperCase(move.charAt(2))) {
-                start=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(0)-'0']&Moves.RankMasks8[1]);
-                end=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(1)-'0']&Moves.RankMasks8[0]);
-            } else {
-                start=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(0)-'0']&Moves.RankMasks8[6]);
-                end=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(1)-'0']&Moves.RankMasks8[7]);
-            }
-            append=""+Character.toLowerCase(move.charAt(2));
-        } else if (move.charAt(3)=='E') {//en passant
-            if (move.charAt(2)=='W') {
-                start=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(0)-'0']&Moves.RankMasks8[3]);
-                end=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(1)-'0']&Moves.RankMasks8[2]);
-            } else {
-                start=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(0)-'0']&Moves.RankMasks8[4]);
-                end=Long.numberOfTrailingZeros(Moves.FileMasks8[move.charAt(1)-'0']&Moves.RankMasks8[5]);
-            }
-        }
-        String returnMove="";
-        returnMove+=(char)('a'+(start%8));
-        returnMove+=(char)('8'-(start/8));
-        returnMove+=(char)('a'+(end%8));
-        returnMove+=(char)('8'-(end/8));
-        returnMove+=append;
-        return returnMove;
-    }
-    public static void algebraToMove(String input,String moves) {
-        int start=0,end=0;
+        String output = "";
         int from=(input.charAt(0)-'a')+(8*('8'-input.charAt(1)));
         int to=(input.charAt(2)-'a')+(8*('8'-input.charAt(3)));
-        for (int i=0;i<moves.length();i+=4) {
-            if (Character.isDigit(moves.charAt(i+3))) {//'regular' move
-                start=(Character.getNumericValue(moves.charAt(i+0))*8)+(Character.getNumericValue(moves.charAt(i+1)));
-                end=(Character.getNumericValue(moves.charAt(i+2))*8)+(Character.getNumericValue(moves.charAt(i+3)));
-            } else if (moves.charAt(i+3)=='P') {//pawn promotion
-                if (Character.isUpperCase(moves.charAt(i+2))) {
-                    start=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+0)-'0']&Moves.RankMasks8[1]);
-                    end=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+1)-'0']&Moves.RankMasks8[0]);
-                } else {
-                    start=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+0)-'0']&Moves.RankMasks8[6]);
-                    end=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+1)-'0']&Moves.RankMasks8[7]);
-                }
-            } else if (moves.charAt(i+3)=='E') {//en passant
-                if (moves.charAt(i+2)=='W') {
-                    start=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+0)-'0']&Moves.RankMasks8[3]);
-                    end=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+1)-'0']&Moves.RankMasks8[2]);
-                } else {
-                    start=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+0)-'0']&Moves.RankMasks8[4]);
-                    end=Long.numberOfTrailingZeros(Moves.FileMasks8[moves.charAt(i+1)-'0']&Moves.RankMasks8[5]);
-                }
-            }
-            if ((start==from) && (end==to)) {
-                if ((input.charAt(4)==' ') || (Character.toUpperCase(input.charAt(4))==Character.toUpperCase(moves.charAt(i+2)))) {
-                    if (Character.isDigit(moves.charAt(i+3))) {//'regular' move
-                        start=(Character.getNumericValue(moves.charAt(i))*8)+(Character.getNumericValue(moves.charAt(i+1)));
-                        if (((1L<<start)&UserInterface.WK)!=0) {UserInterface.CWK=false; UserInterface.CWQ=false;}
-                        else if (((1L<<start)&UserInterface.BK)!=0) {UserInterface.CBK=false; UserInterface.CBQ=false;}
-                        else if (((1L<<start)&UserInterface.WR&(1L<<63))!=0) {UserInterface.CWK=false;}
-                        else if (((1L<<start)&UserInterface.WR&(1L<<56))!=0) {UserInterface.CWQ=false;}
-                        else if (((1L<<start)&UserInterface.BR&(1L<<7))!=0) {UserInterface.CBK=false;}
-                        else if (((1L<<start)&UserInterface.BR&1L)!=0) {UserInterface.CBQ=false;}
-                    }
-                    UserInterface.EP=Moves.makeMoveEP(UserInterface.WP|UserInterface.BP,moves.substring(i,i+4));
-                    UserInterface.WR=Moves.makeMoveCastle(UserInterface.WR, UserInterface.WK|UserInterface.BK, moves.substring(i,i+4), 'R');
-                    UserInterface.BR=Moves.makeMoveCastle(UserInterface.BR, UserInterface.WK|UserInterface.BK, moves.substring(i,i+4), 'r');
-                    UserInterface.WP=Moves.makeMove(UserInterface.WP, moves.substring(i,i+4), 'P');
-                    UserInterface.WN=Moves.makeMove(UserInterface.WN, moves.substring(i,i+4), 'N');
-                    UserInterface.WB=Moves.makeMove(UserInterface.WB, moves.substring(i,i+4), 'B');
-                    UserInterface.WR=Moves.makeMove(UserInterface.WR, moves.substring(i,i+4), 'R');
-                    UserInterface.WQ=Moves.makeMove(UserInterface.WQ, moves.substring(i,i+4), 'Q');
-                    UserInterface.WK=Moves.makeMove(UserInterface.WK, moves.substring(i,i+4), 'K');
-                    UserInterface.BP=Moves.makeMove(UserInterface.BP, moves.substring(i,i+4), 'p');
-                    UserInterface.BN=Moves.makeMove(UserInterface.BN, moves.substring(i,i+4), 'n');
-                    UserInterface.BB=Moves.makeMove(UserInterface.BB, moves.substring(i,i+4), 'b');
-                    UserInterface.BR=Moves.makeMove(UserInterface.BR, moves.substring(i,i+4), 'r');
-                    UserInterface.BQ=Moves.makeMove(UserInterface.BQ, moves.substring(i,i+4), 'q');
-                    UserInterface.BK=Moves.makeMove(UserInterface.BK, moves.substring(i,i+4), 'k');
-                    UserInterface.WhiteToMove=!UserInterface.WhiteToMove;
-                    break;
-                    //comment
-                }
-            }
+        if(side == 1) {
+        	if("P".equals(ChessProject.board[from/8][from%8])) {//pawn move
+        		if( from/8 == 1) {//promotion
+        			output = ""+(from%8)+(to%8)+ChessProject.board[to/8][to%8]+String.valueOf(input.charAt(4)).toUpperCase()+"P";
+        		}
+        		else { //non-promotion
+        			output = ""+(from/8)+(from%8)+(to/8)+(to%8)+ChessProject.board[to/8][to%8];
+        		}
+        		
+        	}
+        	else if("K".equals(ChessProject.board[from/8][from%8])) {//king moves
+        		if(from == 60 && to == 62) {//king-side castle
+        			output = "7476C";
+        		}
+        		else if(from == 60 && to == 58) {//queen-side castle
+        			output = "7472C";
+        		}
+        		else {//normal king move
+        			output = ""+(from/8)+(from%8)+(to/8)+(to%8)+ChessProject.board[to/8][to%8];
+        		}
+        	}
+        	else {//regular move with other piece
+        		output = ""+(from/8)+(from%8)+(to/8)+(to%8)+ChessProject.board[to/8][to%8];
+        	}
+        	
+    
+        
+    }
+        if(moves.replaceAll(output,"").length() < moves.length()) {
+        	return output;
         }
+        return "";
+        
     }
-    public static void inputQuit() {
-        System.exit(0);
-    }
-    public static void inputPrint() {
-        BoardGeneration.drawArray(UserInterface.WP,UserInterface.WN,UserInterface.WB,UserInterface.WR,UserInterface.WQ,UserInterface.WK,UserInterface.BP,UserInterface.BN,UserInterface.BB,UserInterface.BR,UserInterface.BQ,UserInterface.BK);
-    }
-     */
+   
 }
     
     

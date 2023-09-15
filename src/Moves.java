@@ -1,4 +1,4 @@
-import java.util.Arrays;
+//import java.util.Arrays;
 
 public class Moves {
 	
@@ -231,6 +231,7 @@ public class Moves {
 						}
 					}catch(Exception e) {}
 					try{//promotion
+						//format: col+new-col+oldPiece+Convertedpiece+"P" (for promotion)
 						if(i<16 && Character.isLowerCase(ChessProject.board[r-1][c+j].charAt(0))){
 							String[] temp = {"Q","N", "R", "B"};
 							for(int k=0; k<4;k++) {

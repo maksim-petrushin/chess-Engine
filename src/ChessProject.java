@@ -6,7 +6,7 @@ public class ChessProject {
 	static String board[][]= {
 			
 			//castle check 1
-			
+			/*
 			{" "," "," "," ","k"," "," ","r"},
 			{"p"," ","P"," "," "," "," ","p"},
 			{"P"," "," "," ","P","P"," ","P"},
@@ -15,7 +15,7 @@ public class ChessProject {
 			{"P"," "," "," "," "," "," ","P"},
 			{"P"," "," "," "," "," "," ","P"},
 			{"R"," "," "," ","K"," "," ","R"},
-			/*
+			
 			//midgame puzzle 1
 			{" ","k","r"," "," "," ","n","r"},
 			{"p","p","p"," "," "," ","b","p"},
@@ -46,7 +46,7 @@ public class ChessProject {
 			{" "," "," "," "," "," "," ","K"},
 			{" "," "," "," "," "," "," "," "},
 			
-			
+			*/
 				//starting board	
 			{"r","n","b","q","k","b","n","r"},
 			{"p","p","p","p","p","p","p","p"},
@@ -56,9 +56,9 @@ public class ChessProject {
 			{" "," "," "," "," "," "," "," "},
 			{"P","P","P","P","P","P","P","P"},
 			{"R","N","B","Q","K","B","N","R"},
-			*/
+			
 	};
-	static int globalDepth = 4;
+	static int globalDepth = 1;
 	static int maxetIsWhite = 1;
 	static int isWhitesTurn = 1;
 	static int whiteCastlePossible = 1;
@@ -69,14 +69,6 @@ public class ChessProject {
 	static JFrame frame = new JFrame("Engine Maxet");
 	public static void main(String[] args) {
 		//System.out.print("Is Engine Maxet White? (1 - yes, 0 - no): ");
-		Scanner sc = new Scanner(System.in);
-		//maxetIsWhite = sc.nextInt();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		UserInterface ui = new UserInterface();
-		frame.add(ui);
-		frame.setSize(600, 600);
-		frame.setVisible(true);
-		frame.repaint();
 		for(int i=0; i<64; i++) {
 			switch(ChessProject.board[i/8][i%8]) {
 				case "K":
@@ -88,18 +80,46 @@ public class ChessProject {
 				default:
 					break;
 			}
-			
 
 		}
-		System.out.println(whiteKing);
-		System.out.println(blackKing);
+		Scanner sc = new Scanner(System.in);
+		String move = "1";
+		String possibleMoves = "";
+		String myMove = "";
+		
+		//print board
+		for(int i = 0; i< 8; i++) {
+			System.out.println(Arrays.toString(ChessProject.board[i]));
+		}
+		
+//		//maxetIsWhite = sc.nextInt();
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		UserInterface ui = new UserInterface();
+//		frame.add(ui);
+//		frame.setSize(600, 600);
+//		frame.setVisible(true);
+//		frame.repaint();
+		
+		while(move.charAt(0) != '0') {
+			System.out.println("Enter your move in UCI");
+			move = sc.nextLine();
+			possibleMoves = Moves.possibleMoves(1);
+			myMove = UCI.algebraToMove(move, possibleMoves, 1);
+			
+			Moves.makeMove(myMove, 1);
+			
+			//print board
+			for(int i = 0; i< 8; i++) {
+				System.out.println(Arrays.toString(ChessProject.board[i]));
+			}
+			
+	
+		}
 		
 		//if(maxetIsWhite == 1) {	
 			
 		//	callAlphaBeta();
-		for(int i = 0; i< 8; i++) {
-			System.out.println(Arrays.toString(ChessProject.board[i]));
-		}
+
 		//	frame.repaint();
 			
 		//}
